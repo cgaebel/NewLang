@@ -20,9 +20,9 @@ Language Specification
 
 Objects are defined as POD.
 
-Any function taking an Object* as its first parameter can be syntactically used as a member function of that typed.
+Any function taking an Object* as its first parameter can be syntactically used as a member function of that typed. This can be extended to accomodate a multiple-dispatch syntax.
 
-Any function returning an instance of an object can be used as a constructor for that object (if they take a const object as a parameter, it's a copy constructor).
+Any function returning an instance of an object can be used as a constructor for that object (if it takes a const object as a parameter, it's a copy constructor).
 
 Move constructors do not exist; move constructors should be simple moving of data.
 
@@ -53,4 +53,12 @@ Anonymous structs are a thing; members can be either named, or accessed with arr
 n-conditionals are allowed (e.g. x < y < z = 0).
 
 Embedded C and assembly are allowed.
+
+Inheritance (and, by extension, polymorphism) is not a thing.
+
+Const-casting is not a thing.
+
+Unit-testing resembles that of D.
+
+Only three build types: Debug (simple optimizations, focus on quick compilation), Release (focus on fastest code), -O0 (no optimization whatsoever).
 
