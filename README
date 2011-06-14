@@ -1,4 +1,20 @@
 ----------------------------------
+Points of Contention
+----------------------------------
+
+Generics should almost never be used. Consider their elimination from the language, or a serious refactoring.
+
+Consider making only one kind of comment.
+
+"void" is often used simply as a compensation for a mediocre type system. Can this be eliminated?
+
+Operator-overloading is almost always a bad idea. It should perhaps be disallowed.
+
+reinterpret_cast is almost always a bad idea. Its useful points should be refactored into a safer, better system.
+
+Destructors are often misused, but arguably necessary - can they be improved?
+
+----------------------------------
 Language Specification
 ----------------------------------
 
