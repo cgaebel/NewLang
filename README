@@ -31,3 +31,10 @@ Calling conventions will be undefined from function to function; the compiler/op
 There is a "pure" keyword.
 
 There is a "const" or "immutable" keyword.
+
+Anonymous structs are a thing; members can be either named, or accessed with array operators (tuples).
+
+n-conditionals are allowed (e.g. x < y < z = 0).
+
+Embedded C and assembly are allowed.
+
