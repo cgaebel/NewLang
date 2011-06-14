@@ -1,0 +1,33 @@
+----------------------------------
+Language Specification
+----------------------------------
+
+Objects are defined as POD.
+
+Any function taking an Object* as its first parameter can be syntactically used as a member function of that typed.
+
+Any function returning an instance of an object can be used as a constructor for that object (if they take a const object as a parameter, it's a copy constructor).
+
+Move constructors do not exist; move constructors should be simple moving of data.
+
+The \ character will replace the -> operator.
+
+There are no references (as in "transparent" pointers).
+
+No header files, only modules.
+
+Static constructors from D still exist (likely renamed to init(), or something similar).
+
+Strings are vectors of chars.
+
+Anonymous functions can be created with the function keyword.
+
+The "infer" keyword will replace "auto".
+
+All built-in types will have default initialization values; if default initialization is not wanted, there will be a keyword to prevent initialization.
+
+Calling conventions will be undefined from function to function; the compiler/optimizer may choose. This can be overriden if necessary.
+
+There is a "pure" keyword.
+
+There is a "const" or "immutable" keyword.
