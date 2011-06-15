@@ -99,7 +99,7 @@ conformity and only allowing casting from pointers TO integer types (not back)._
 
 ## Object Model
 
-Objects are POD (pieces of data).
+Objects are POD (plain old data).
 
     struct SomeObject
     {
