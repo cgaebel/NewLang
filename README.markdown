@@ -1,5 +1,4 @@
-Meta
-======
+# Meta
 
 * Wrap 80 characters/line.
 * Have code samples for every language feature.
@@ -11,10 +10,20 @@ Meta
     * Rationale
     * Limitations (optional)
 
-Points of Contention
-====================
+# Language Specification
 
-Generics should be a language feature.
+## Points of Contention
+
+### Indentation should be used instead of braces for indicating scope.
+
+* Pros
+    * Enforces nice readability.
+    * More intuitive.
+* Cons
+    * Less intuitive to C/C++-style programmers.
+    * Less flexible.
+
+### Generics should be a language feature.
 
 * Pros
     * How do we implement vectors without? It really should be a library
@@ -23,10 +32,10 @@ Generics should be a language feature.
     * Simplicity. Both in reading code and in compiler implementation.
     * Have you _seen_ C++?
 
-_ben: Perhaps they could be simplified greatly, only allowing for type
+_ben: Perhaps they could be simplified greatly, only allowing for simple type
 generics, rather than the giant Turing-complete templates C++ has._
 
-There should only be one way for comments to be parsed, unlike C which has two.
+### There should only be one way for comments to be parsed, unlike C which has two.
 
 * Pros
     * Uniformity of source code.
@@ -39,14 +48,9 @@ There should only be one way for comments to be parsed, unlike C which has two.
 _ben: For me, block comments are only useful when temporarily removing code.
 Perhaps we should have a different language feature for that._
 
-"void" is often used simply as a compensation for a mediocre type system. Can
-this be eliminated?
+### void* should be eliminated.
 
-_clark: I don't think so. How do we define 'no return value'?_
-_ben: Agreed, though maybe change the keyword. I was actually thinking of void*
-when I wrote that._
-
-Operator overloading should be a language feature.
+### Operator overloading should be a language feature.
 
 * Pros
     * A bignum library (or any numerical processing, really) would be elegant.
@@ -60,7 +64,7 @@ _ben: Overloaded operators should have a guarantee of purity - that if the same
 object is invoked with the same operator and the same parameter(s), then the
 result is guaranteed._
 
-Casting between arbitrary types should be allowed, similar to C++'s
+### Casting between arbitrary types should be allowed, similar to C++'s
 `reinterpret_cast`.
 
 * Pros
@@ -74,7 +78,7 @@ Casting between arbitrary types should be allowed, similar to C++'s
 _ben: Allow it, but with much greater restrictions than those of C++, like size
 conformity and only allowing casting from pointers TO integer types (not back)._
 
-Destructors. They should exist. If you agree, in what form?
+### Destructors. They should exist. If you agree, in what form?
 
 * Pros
     * Resource cleanup is sane. A File struct makes sense.
@@ -84,7 +88,7 @@ Destructors. They should exist. If you agree, in what form?
       language features, however, then destructors seem okay.
     * How will they interact with our inheritance model?
 
-Inline assembly.
+### Inline assembly.
 
 * Pros
     * Makes the language a true systems programming language.
@@ -94,11 +98,7 @@ Inline assembly.
     * Complicates things. What could have once been undefined behavior now
       needs precise, well-documented semantics.
 
-Language Specification
-=======================
-
-Object Model
--------------
+## Object Model
 
 Objects are POD (pieces of data).
 
@@ -156,17 +156,29 @@ the default constructors of each element of the structure.
 
     S s; // in this case, we have a default constructor. s will be { 1, 2, 3 }.
 
+### Move Constructors
+
 Move constructors do not exist; move constructors should be simple moving
 of data. There may be some situations where this fails horribly, but I can't
 think of any. y = move(x) is a compiler built-in, and is checked for
 correctness whenever possible.
+
+### Inheritance/Polymorphism
+
+Inheritance (and, by extension, polymorphism) is not a language built-in. A
+vtable library will be provided by the standard library to assist in explicit
+construction.
+
+## Pointers
 
 The \ character will replace C's -> operator. This is to reduce typing, turning
 the common dereference operator into one keystroke instead of three.
 
     s->x    ===>    s\x
 
-There are no references (as in "transparent" pointers).
+C++'s references (as a replacement for pointers) do not exist.
+
+## To Be Organized
 
 No header files, only modules. We can probably rip off D's module system in its
 entirety.
@@ -201,10 +213,6 @@ n-conditionals are allowed (e.g. x < y < z = 0).
 
 Nice interfacing with C.
 
-Inheritance (and, by extension, polymorphism) is not a language built-in. A
-vtable library will be provided by the standard library to assist in explicit
-construction.
-
 Casting away `const` is illegal - not undefined behavior.
 
 Unit-testing resembles that of D, but has an API accessible from `main()` which
@@ -212,8 +220,7 @@ handles test reporting, running, etc. Possibly run tests before `main()` iff
 `test_ext` has not been imported. Otherwise, don't run any tests except those
 explicitly run by `main()`.
 
-Compiler Options
------------------
+## Compiler Options
 
 * Build types
     * Debug
