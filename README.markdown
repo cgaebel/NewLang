@@ -1,5 +1,5 @@
----------------------------------- Points of Contention
-----------------------------------
+Points of Contention
+-----------------------
 
 Generics should almost never be used. Consider their elimination from the
 language, or a serious refactoring.
@@ -17,12 +17,12 @@ refactored into a safer, better system.
 
 Destructors are often misused, but arguably necessary - can they be improved?
 
----------------------------------- Language Specification
-----------------------------------
+Language Specification
+-------------------------
 
 Objects are defined as POD.
 
-Any function taking an Object* as its first parameter can be syntactically
+Any function taking an Object\* as its first parameter can be syntactically
 used as a member function of that typed. This can be extended to accomodate
 a multiple-dispatch syntax.
 
