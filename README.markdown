@@ -222,3 +222,11 @@ Compiler Options
         * Full optimization. All asserts off.
         * Focus on fast code. That's it. Asserts will be off, and build time
           will be sacrificed for final runtime speed.
+
+Compiler Internals
+-------------------
+
+The compiler should be designed modularly, and as a library. The binary will
+just be a litle driver (no more than absolutely necessary, such as argument
+parsing) to the main compilation library. Then, the compiler library will be
+available in stdlib.
