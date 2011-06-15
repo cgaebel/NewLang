@@ -42,7 +42,7 @@ a multiple-dispatch syntax.
 
 Therefore,
 
-    int foo(SomeObject* this, int xZZ, int y)
+    int foo(SomeObject* this, int x, int y)
     {
         ++this\c;
         return x + y + this\a;
