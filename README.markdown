@@ -64,8 +64,7 @@ _ben: Overloaded operators should have a guarantee of purity - that if the same
 object is invoked with the same operator and the same parameter(s), then the
 result is guaranteed._
 
-### Casting between arbitrary types should be allowed, similar to C++'s
-`reinterpret_cast`.
+### Casting between arbitrary types should be allowed.
 
 * Pros
     * Allows for systems programming tasks such as reversing the bytes in a
