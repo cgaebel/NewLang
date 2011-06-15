@@ -1,5 +1,4 @@
-Meta
-======
+# Meta
 
 * Wrap 80 characters/line.
 * Have code samples for every language feature.
@@ -11,10 +10,20 @@ Meta
     * Rationale
     * Limitations (optional)
 
-Points of Contention
-====================
+# Language Specification
 
-Generics should be a language feature.
+## Points of Contention
+
+### Indentation should be used instead of braces for indicating scope.
+
+* Pros
+    * Enforces nice readability.
+    * More intuitive.
+* Cons
+    * Less intuitive to C/C++-style programmers.
+    * Less flexible.
+
+### Generics should be a language feature.
 
 * Pros
     * How do we implement vectors without? It really should be a library
@@ -23,7 +32,10 @@ Generics should be a language feature.
     * Simplicity. Both in reading code and in compiler implementation.
     * Have you _seen_ C++?
 
-There should only be one way for comments to be parsed, unlike C which has two.
+_ben: Perhaps they could be simplified greatly, only allowing for simple type
+generics, rather than the giant Turing-complete templates C++ has._
+
+### There should only be one way for comments to be parsed, unlike C which has two.
 
 * Pros
     * Uniformity of source code.
@@ -33,12 +45,12 @@ There should only be one way for comments to be parsed, unlike C which has two.
     * Block comments are nice!
     * Choosing one will be a bitch.
 
-"void" is often used simply as a compensation for a mediocre type system. Can
-this be eliminated?
+_ben: For me, block comments are only useful when temporarily removing code.
+Perhaps we should have a different language feature for that._
 
-_clark: I don't think so. How do we define 'no return value'?_
+### void* should be eliminated.
 
-Operator overloading should be a language feature.
+### Operator overloading should be a language feature.
 
 * Pros
     * A bignum library (or any numerical processing, really) would be elegant.
@@ -48,18 +60,24 @@ Operator overloading should be a language feature.
     * Has different semantics from functions entirely! Infix expressions are
       just so alien.
 
-Casting between arbitrary types should be allowed, similar to C++'s
-`reinterpret_cast`.
+_ben: Overloaded operators should have a guarantee of purity - that if the same
+object is invoked with the same operator and the same parameter(s), then the
+result is guaranteed._
+
+### Casting between arbitrary types should be allowed.
 
 * Pros
     * Allows for systems programming tasks such as reversing the bytes in a
       number. It can be argued that this can be done with bitshifts, but I'd
       rather have the compiler do it.
 * Cons
-    * Makes the compilers job harder. Less assumptions can be made.
+    * Makes the compiler's job harder. Less assumptions can be made.
     * It's evil. Almost everywhere. Is there anywhere it's necessary?
 
-Destructors. They should exist. If you agree, in what form?
+_ben: Allow it, but with much greater restrictions than those of C++, like size
+conformity and only allowing casting from pointers TO integer types (not back)._
+
+### Destructors. They should exist. If you agree, in what form?
 
 * Pros
     * Resource cleanup is sane. A File struct makes sense.
@@ -69,7 +87,7 @@ Destructors. They should exist. If you agree, in what form?
       language features, however, then destructors seem okay.
     * How will they interact with our inheritance model?
 
-Inline assembly.
+### Inline assembly.
 
 * Pros
     * Makes the language a true systems programming language.
@@ -79,13 +97,9 @@ Inline assembly.
     * Complicates things. What could have once been undefined behavior now
       needs precise, well-documented semantics.
 
-Language Specification
-=======================
+## Object Model
 
-Object Model
--------------
-
-Objects are POD (pieces of data).
+Objects are POD (plain old data).
 
     struct SomeObject
     {
@@ -95,7 +109,7 @@ Objects are POD (pieces of data).
     }
 
 Any function taking an Object\* as its first parameter can be syntactically
-used as a member function of that typed. This can be extended to accomodate
+used as a member function of that type. This can be extended to accomodate
 a multiple-dispatch syntax.
 
 Therefore,
@@ -141,17 +155,29 @@ the default constructors of each element of the structure.
 
     S s; // in this case, we have a default constructor. s will be { 1, 2, 3 }.
 
+### Move Constructors
+
 Move constructors do not exist; move constructors should be simple moving
 of data. There may be some situations where this fails horribly, but I can't
 think of any. y = move(x) is a compiler built-in, and is checked for
 correctness whenever possible.
+
+### Inheritance/Polymorphism
+
+Inheritance (and, by extension, polymorphism) is not a language built-in. A
+vtable library will be provided by the standard library to assist in explicit
+construction.
+
+## Pointers
 
 The \ character will replace C's -> operator. This is to reduce typing, turning
 the common dereference operator into one keystroke instead of three.
 
     s->x    ===>    s\x
 
-There are no references (as in "transparent" pointers).
+C++'s references (as a replacement for pointers) do not exist.
+
+## To Be Organized
 
 No header files, only modules. We can probably rip off D's module system in its
 entirety.
@@ -176,33 +202,24 @@ compiler/optimizer may choose. This can be overriden if necessary.
 There is a "pure" keyword. If a function is pure and unannotated, emit a
 diagnostic. If a function is annotated pure and is not, terminate compilation.
 
-There is a "const" or "immutable" keyword.
-_clark: I like const. It's shorter._
+"const" stays.
 
 Anonymous structs are a thing; members can be either named, or accessed with
 array operators (tuples). A syntax still needs to be decided upon. It should
 probably resemble lambdas.
 
 n-conditionals are allowed (e.g. x < y < z = 0).
-_clark: Fuck. Yes._
 
-Embedded C.
-_clark: Embedded C? I'd rather not write a C compiler too. I'm okay with being
-able to interface with C, though. In fact, that's necessary._
+Nice interfacing with C.
 
-Inheritance (and, by extension, polymorphism) is not a language built-in. A
-vtable library will be provided by the standard library to assist in explicit
-construction.
-
-Casting away const is illegal - not undefined behavior.
+Casting away `const` is illegal - not undefined behavior.
 
 Unit-testing resembles that of D, but has an API accessible from `main()` which
 handles test reporting, running, etc. Possibly run tests before `main()` iff
 `test_ext` has not been imported. Otherwise, don't run any tests except those
-explicity run by `main()`.
+explicitly run by `main()`.
 
-Compiler Options
------------------
+## Compiler Options
 
 * Build types
     * Debug
@@ -216,7 +233,7 @@ Compiler Options
     * Release
         * Full optimization. All asserts on (custom hook enabled).
         * Focus on production-quality code. Build time is not important, and is
-          sacrified to improve quality of shipping code. Asserts are also on,
+          sacrificed to improve quality of shipping code. Asserts are also on,
           but can be hooked by the program to do proper error-reporting.
     * Fast
         * Full optimization. All asserts off.
