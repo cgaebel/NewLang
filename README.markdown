@@ -24,7 +24,7 @@ Generics should be a language feature.
     * Have you _seen_ C++?
 
 _ben: Perhaps they could be simplified greatly, only allowing for type
-generics, rather than the giant turing-complete templates C++ has._
+generics, rather than the giant Turing-complete templates C++ has._
 
 There should only be one way for comments to be parsed, unlike C which has two.
 
@@ -43,7 +43,8 @@ Perhaps we should have a different language feature for that._
 this be eliminated?
 
 _clark: I don't think so. How do we define 'no return value'?_
-_ben: Agreed, though maybe change the keyword. What about void*?_
+_ben: Agreed, though maybe change the keyword. I was actually thinking of void*
+when I wrote that._
 
 Operator overloading should be a language feature.
 
@@ -204,12 +205,12 @@ Inheritance (and, by extension, polymorphism) is not a language built-in. A
 vtable library will be provided by the standard library to assist in explicit
 construction.
 
-Casting away const is illegal - not undefined behavior.
+Casting away `const` is illegal - not undefined behavior.
 
 Unit-testing resembles that of D, but has an API accessible from `main()` which
 handles test reporting, running, etc. Possibly run tests before `main()` iff
 `test_ext` has not been imported. Otherwise, don't run any tests except those
-explicity run by `main()`.
+explicitly run by `main()`.
 
 Compiler Options
 -----------------
@@ -226,7 +227,7 @@ Compiler Options
     * Release
         * Full optimization. All asserts on (custom hook enabled).
         * Focus on production-quality code. Build time is not important, and is
-          sacrified to improve quality of shipping code. Asserts are also on,
+          sacrificed to improve quality of shipping code. Asserts are also on,
           but can be hooked by the program to do proper error-reporting.
     * Fast
         * Full optimization. All asserts off.
