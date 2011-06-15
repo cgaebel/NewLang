@@ -48,7 +48,7 @@ generics, rather than the giant Turing-complete templates C++ has._
 _ben: For me, block comments are only useful when temporarily removing code.
 Perhaps we should have a different language feature for that._
 
-### void* should be eliminated.
+### `void*` should be eliminated.
 
 ### Operator overloading should be a language feature.
 
@@ -108,7 +108,7 @@ Objects are POD (plain old data).
         int c;
     }
 
-Any function taking an Object\* as its first parameter can be syntactically
+Any function taking an `Object*` as its first parameter can be syntactically
 used as a member function of that type. This can be extended to accomodate
 a multiple-dispatch syntax.
 
@@ -131,8 +131,11 @@ is entirely valid syntax.
 There is only one special constructor - the default constructor. This is
 defined as a function with the same name as the structure is is
 constructing. All built-in structures have a default constructor, and if
-one is not provided by the code, the compiler shall create one which calls
-the default constructors of each element of the structure.
+one is not provided by the code, the compiler shall create one which does
+nothing.
+
+Before an object's default constructor is called, the default constructor for
+all its children will be called.
 
     struct S
     {
@@ -146,21 +149,81 @@ the default constructors of each element of the structure.
 
     ///////////////////////////////////////////////////////////////////////////
 
-    none S(S* this)
+    S S()
     {
-        this\a = 1;
-        this\b = 2;
-        this\c = 3;
+        S ret; // TODO: This is recursive. Fix. Do we need a different syntax?
+               //       What if we had an implicit `this` parameter, which is
+               //       a pointer to the object to be constructed (after its
+               //       children have been)?
+
+        ret.a = 1;
+        ret.b = 2;
+        ret.c = 3;
+
+        return ret;
     }
 
     S s; // in this case, we have a default constructor. s will be { 1, 2, 3 }.
 
-### Move Constructors
+To define a constructor which takes arguments, you can just use an ordinary
+function!
 
-Move constructors do not exist; move constructors should be simple moving
-of data. There may be some situations where this fails horribly, but I can't
-think of any. y = move(x) is a compiler built-in, and is checked for
-correctness whenever possible.
+    S S(int x, int y)
+
+        S ret; // calls the default constructor first...
+
+        ret.a = x;
+        ret.b = y;
+        
+        assert(ret.c == 3); // From the default constructor.
+
+        return ret;
+    }
+
+    S s = S(9, 10);
+    assert(s == { 9, 10, 3 });
+
+### Copying and Moving Data
+
+Copying is done automatically by the compiler when necessary, such as assigning
+from an lvalue, or passing-by-value. It is done in two steps:
+
+1. Each element of the structure is copied recursively.
+2. `pcopy()` is run on the new structure.
+
+`pcopy()` is a user-defined function defined as `void pcopy(S*)` where S is the
+type of the struct you want `pcopy` to be defined for. It stands for *p*ost
+*copy* since the function is run after the structure's elements have been
+copied. If `pcopy()` is not defined for a structure, a blank one is generated
+by the compiler.
+
+    struct S { int a; }
+
+    void pcopy(S* s)
+    {
+        s\a += 1; // increments s\a every time a copy is made.
+    }
+
+    S s;
+    assert(s.a == 0); // thanks to int's default constructor
+
+    S x = s;
+    assert(x.a == 1);
+
+    // Even though S is returned, pcopy isn't run. This is because it is
+    // entirely transparent, and would just be wasted cycles.
+    S returns1()
+    {
+        S ret;
+        ret.a = 1;
+        return ret;
+    }
+
+    S y = returns1();
+    assert(y.a == 1);
+
+Move constructors are not necessary, since it can be emulated by the compiler
+refusing to call `pcopy()`.
 
 ### Inheritance/Polymorphism
 
@@ -177,7 +240,14 @@ the common dereference operator into one keystroke instead of three.
 
 C++'s references (as a replacement for pointers) do not exist.
 
+_clark: I'm starting to come around on the uniform `.` syntax. We should talk._
+
 ## To Be Organized
+
+`assert(expr)` will be a compiler built-in. If the expression can be resolved
+at compile time, it will be. In release/fast builds, the expression becomes an
+assumption for the optimizer. This provides performance incentives to defensive
+coding.
 
 No header files, only modules. We can probably rip off D's module system in its
 entirety.
