@@ -10,6 +10,28 @@
     * Rationale
     * Limitations (optional)
 
+# Viability
+
+In order for this language to be worth its salt, the following libraries and
+programs _must_ have an elegant, idiomatic implementation. If it is impossible
+to write any of these cleanly, the language is sorely lacking.
+
+* GUI Toolkit
+    * Tests the languge's ability to handle common OOP patterns.
+* Arbitrary-sized arithmetic
+    * Performance
+    * Operator overloading
+    * Inline assembly?
+* Security Library
+    * Performance
+    * Correctness testing
+    * Numerical processing
+    * Repetitive code
+* Asynchronous HTTP Server
+    * Concurrency
+    * Performance
+    * Memory management
+
 # Language Specification
 
 ## Points of Contention
