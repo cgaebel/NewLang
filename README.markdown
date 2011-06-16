@@ -47,6 +47,8 @@ generics, rather than the giant Turing-complete templates C++ has._
 
 _ben: For me, block comments are only useful when temporarily removing code.
 Perhaps we should have a different language feature for that._
+_clark: That actually sounds unnecessary. I think I'm down for exclusive single
+line comments. Next time we get together we should decide on a syntax and such._
 
 ### `void*` should be eliminated.
 
@@ -63,6 +65,19 @@ Perhaps we should have a different language feature for that._
 _ben: Overloaded operators should have a guarantee of purity - that if the same
 object is invoked with the same operator and the same parameter(s), then the
 result is guaranteed._
+_clark: What about if when an operator is overloaded, it MUST have the same
+mathematial properties as the thing it's emulating. Therefore, the (+) operator
+must be associative and commutative. This will ensure that only math-emulators
+overload these operators. We still need to think of a syntax though. And don't
+forget that there are unary AND binary operators, as well as the possibilty
+(or lack) of user-defined operators._
+
+What about the following implementation?
+
+    S uop(string op, const S* a);             // unary ops
+    S bop(string op, const S* a, const S* b); // binary ops
+
+Fatal flaw: how do we handle `a += b`?
 
 ### Casting between arbitrary types should be allowed.
 
@@ -76,6 +91,7 @@ result is guaranteed._
 
 _ben: Allow it, but with much greater restrictions than those of C++, like size
 conformity and only allowing casting from pointers TO integer types (not back)._
+_clark: I really like that rule._
 
 ### Destructors. They should exist. If you agree, in what form?
 
@@ -96,6 +112,28 @@ conformity and only allowing casting from pointers TO integer types (not back)._
 * Cons
     * Complicates things. What could have once been undefined behavior now
       needs precise, well-documented semantics.
+
+### Unit tests for separate modules should be run in parallel.
+
+* Pros
+    * Testing becomes significantly faster.
+    * Thread-unsafe code will break.
+* Cons
+    * Every module's public API will need to be reentrant.
+
+_clark: This MAY be a good thing, since there's no legacy code that needs
+porting. And since it's baked into the language, it essentially REQUIRES people
+to write thread-safe APIs._
+
+## Built-in types
+
+* int\[8, 16, 32, 64, inf\] (unsigned types begin with `u`)
+* native (unsigned. memsize)
+* ptrdiff (signed, memsize)
+* bool (Only two valid assignments - true/false. No other assumptions about its
+  representation are made.)
+* tinyfloat (equivalent to Cs `float`)
+* float (equivalent to Cs `double`)
 
 ## Object Model
 
@@ -135,7 +173,7 @@ one is not provided by the code, the compiler shall create one which does
 nothing.
 
 Before an object's default constructor is called, the default constructor for
-all its children will be called.
+all its elements will be called.
 
     struct S
     {
@@ -231,6 +269,10 @@ Inheritance (and, by extension, polymorphism) is not a language built-in. A
 vtable library will be provided by the standard library to assist in explicit
 construction.
 
+## Functions
+
+*TODO*
+
 ## Pointers
 
 The \ character will replace C's -> operator. This is to reduce typing, turning
@@ -241,6 +283,21 @@ the common dereference operator into one keystroke instead of three.
 C++'s references (as a replacement for pointers) do not exist.
 
 _clark: I'm starting to come around on the uniform `.` syntax. We should talk._
+
+## Testing
+
+Tests are run as the final step in compilation. A failed test is equal to a
+failed build. There is no such thing as disabling all tests, but specific tests
+may be disabled with an attribute on the unittest block. Possibly something
+like:
+
+    unittest(disable)
+    {
+        assert(2 + 2 == 5); // WHY DOESN'T THIS WORK!?!
+    }
+
+All tests are attempted. If a test fails, it is marked and testing of the rest
+continues.
 
 ## To Be Organized
 
@@ -266,8 +323,8 @@ All built-in types will have default initialization values; if default
 initialization is not wanted, there will be a keyword to prevent
 initialization.
 
-Calling conventions will be undefined from function to function; the
-compiler/optimizer may choose. This can be overriden if necessary.
+Calling conventions will be undefined by default. This ensures the optimizer
+gets the best possible angle of attack on your code.
 
 There is a "pure" keyword. If a function is pure and unannotated, emit a
 diagnostic. If a function is annotated pure and is not, terminate compilation.
@@ -291,21 +348,21 @@ explicitly run by `main()`.
 
 ## Compiler Options
 
-* Build types
-    * Debug
+* Build types (--build)
+    * Debug (--build=debug)
         * No optimizations, all asserts on.
         * Focus on code making sense in a debugger.
-    * Dev (default)
+    * Dev (default) (--build=dev)
         * Simple optimizations, all asserts on.
         * Focus on lowering the build->test cycle. Compilation should be
           blazing fast, but without sacrificing too much run-time speed. There
           is a delicate middle ground that the Dev build tries to find.
-    * Release
+    * Release (--build=release)
         * Full optimization. All asserts on (custom hook enabled).
         * Focus on production-quality code. Build time is not important, and is
           sacrificed to improve quality of shipping code. Asserts are also on,
           but can be hooked by the program to do proper error-reporting.
-    * Fast
+    * Fast (--build=fast)
         * Full optimization. All asserts off.
         * Focus on fast code. That's it. Asserts will be off, and build time
           will be sacrificed for final runtime speed.
@@ -317,3 +374,12 @@ The compiler should be designed modularly, and as a library. The binary will
 just be a litle driver (no more than absolutely necessary, such as argument
 parsing) to the main compilation library. Then, the compiler library will be
 available in stdlib.
+
+Compiler Development
+---------------------
+
+An optimization may only be added to the dev build if and only if it lowers the
+bootstrapping time.
+
+An optimization may only be added to the compiler if and only if the run time
+of the compiler's test suite does not increase with the optimiation enabled.
