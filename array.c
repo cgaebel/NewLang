@@ -1,4 +1,32 @@
-// Defines NewLang's array type.
+// array.c: Defines NewLang's array type.
+// 
+// Eventually, this entire file will have to be written in assembly and the
+// majority of the functions will be inlined directly (except maybe
+// resize_dynamic, since it should be called infrequently). This little library
+// will replace raw contiguous memory as de-facto storage, and is only possible
+// as a language built-in or as an assembly hack.
+//
+// Arrays consist of two parts: the static half, and the dynamic half. The
+// static half is constructed at initialization directly on the stack and has
+// a fixed size throughout the array's lifetime. Note that the static_capacity
+// may be zero if the initial size is unknown at initialization. The static
+// half is analogous to a C99 array.
+//
+// The dynamic half is constructed as the array grows. If more elements are in
+// the list than the capacity of the static half, the excess overflow into the
+// dynamic half. The dynamic half is analogous to a C++ vector, and is
+// constructed on the heap and can be treated like an "unlimited" buffer.
+//
+// The benefits of this design include:
+//   - O(1) random access
+//   - No dynamic allocation unless it's truly needed
+//   - O(n) iteration
+//   - Small codesize
+//   - Of the possible branches in the code, many (if not, all) of them may be
+//     lifted into the parent function and the dead paths, removed.
+//   - Amortized O(1) insertion
+//   - Cache coherency, since many of the elements will reside in the cache-hot
+//     stack, and the rest lie in contiguous memory.
 #include <stddef.h>
 #include <stdbool.h>
 
@@ -13,28 +41,9 @@ struct Array
     Value static_elems[];
 };
 
-// If the array is normalized, all the elements lie in dynamic_elems
-static bool is_normalized(Array* a)
-{
-    return a->static_length == 0;
-}
-
-// Moves all the elements into contiguous memory.
-static void normalize(Array* a)
-{
-    resize_dynamic(a, dynamic_length + static_length);
-
-    memcpy(a->dynamic_elems + a->dynamic_length,
-           a->static_elems,
-           a->static_length * sizeof(Value));
-
-    a->dynamic_length += a->static_length;
-    a->static_length = 0;
-}
-
 static void resize_dynamic(Array* a, size_t newlen)
 {
-    assert(newlen <= a->dynamic_length);
+    assert(a->dynamic_length <= newlen);
 
     // BUG: No OOM checking.
     a->dynamic_elems = realloc(a->dynamic_elems, newlen * sizeof(Value));
@@ -132,4 +141,16 @@ void foreach(Array* a, void (*iter)(Value*, void*), void* aux)
 
     for(size_t i = 0; i < a->dynamic_length; ++i)
         iter(a->dynamic_elems + i, aux);
+}
+
+// Returns a pointer to the value at index `i'.
+// This entire function should be inlined by the compiler.
+Value* index(Array* a, size_t i)
+{
+    assert(i <= length(a));
+
+    if(i < a->static_length)
+        return &a->static_elems[i];
+    else
+        return &a->dynamic_elems[i - a->static_length];
 }
