@@ -57,21 +57,6 @@ to write any of these cleanly, the language is sorely lacking.
 _ben: Perhaps they could be simplified greatly, only allowing for simple type
 generics, rather than the giant Turing-complete templates C++ has._
 
-### There should only be one way for comments to be parsed, unlike C which has two.
-
-* Pros
-    * Uniformity of source code.
-    * Keeps the language simple.
-* Cons
-    * Line comments are nice!
-    * Block comments are nice!
-    * Choosing one will be a bitch.
-
-_ben: For me, block comments are only useful when temporarily removing code.
-Perhaps we should have a different language feature for that._
-_clark: That actually sounds unnecessary. I think I'm down for exclusive single
-line comments. Next time we get together we should decide on a syntax and such._
-
 ### `void*` should be eliminated.
 
 ### Operator overloading should be a language feature.
@@ -322,6 +307,8 @@ All tests are attempted. If a test fails, it is marked and testing of the rest
 continues.
 
 ## To Be Organized
+
+Only single-line comments are allowed, with \#.
 
 `assert(expr)` will be a compiler built-in. If the expression can be resolved
 at compile time, it will be. In release/fast builds, the expression becomes an
