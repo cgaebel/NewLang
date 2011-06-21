@@ -161,15 +161,15 @@ Therefore,
 
     int foo(SomeObject* this, int x, int y)
     {
-        ++this\c;
-        return x + y + this\a;
+        ++this.c;
+        return x + y + this.a;
     }
 
     SomeObject bar;
     int z = bar.foo(2, 3);
 
     SomeObject* pbar = &bar;
-    z = pbar\foo(2, 3);
+    z = pbar.foo(2, 3);
 
 is entirely valid syntax.
 
@@ -246,7 +246,7 @@ by the compiler.
 
     void pcopy(S* s)
     {
-        s\a += 1; // increments s\a every time a copy is made.
+        s.a += 1; // increments s.a every time a copy is made.
     }
 
     S s;
@@ -282,14 +282,11 @@ construction.
 
 ## Pointers
 
-The \ character will replace C's -> operator. This is to reduce typing, turning
-the common dereference operator into one keystroke instead of three.
+In NewLang, the . operator will work for both objects and object pointers.
 
-    s->x    ===>    s\x
+    s->x    ===>    s.x
 
 C++'s references (as a replacement for pointers) do not exist.
-
-_clark: I'm starting to come around on the uniform `.` syntax. We should talk._
 
 ## Testing
 
