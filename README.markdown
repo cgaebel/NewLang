@@ -288,6 +288,9 @@ In NewLang, the . operator will work for both objects and object pointers.
 
 C++'s references (as a replacement for pointers) do not exist.
 
+`restrict` pointers are allowed, with some heavy static checking to ensure
+coder sanity.
+
 ## Testing
 
 Tests are run as the final step in compilation. A failed test is equal to a
