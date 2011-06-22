@@ -187,6 +187,11 @@ different in size from `byte`, thus illegal cast), and any pointer type should
 be castable to an `int`, including nested pointers (e.g. `char**` should be
 castable to an `int*`, since `char*` is castable to `int`)._
 
+_ben: However, pointer-casting is only necessary in low-level applications,
+like your byte-order example above. For such a low-level niche, perhaps C
+should just be used. Forcing people to use C in such cases means we get to
+make the language much safer by disallowing pointer-casting altogether._
+
 ### How should destructors be implemented?
 
 Some kind of resource-cleanup is necessary, but destructors can also have
