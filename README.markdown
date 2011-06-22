@@ -65,7 +65,7 @@ be incredibly unintuitive to C++-style programmers._
 
 ### How should class generics be implemented?
 
-_ben: My current way would be:
+_ben: My current way would be:_
 
     Type vector(typename)
     {
@@ -73,7 +73,7 @@ _ben: My current way would be:
         uint length;
     }
 
-Essentially function-definition syntax, but with `Type` as the return type._
+_Essentially function-definition syntax, but with `Type` as the return type._
 
 ### Equality and assignment should be the same operator.
 
@@ -91,9 +91,9 @@ Essentially function-definition syntax, but with `Type` as the return type._
 
 ### Backslash should be used as the pointer operator.
 
-`int i = 5;
-\int p = \i
-int j = p\`
+    int i = 5;
+    \int p = \i
+    int j = p\
 
 The second line is read intuitively as "A pointer to an integer, `p`, is a
 pointer to `i`"
