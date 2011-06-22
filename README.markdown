@@ -187,15 +187,14 @@ different in size from `byte`, thus illegal cast), and any pointer type should
 be castable to an `int`, including nested pointers (e.g. `char**` should be
 castable to an `int*`, since `char*` is castable to `int`)._
 
-### Destructors. They should exist. If you agree, in what form?
+### How should destructors be implemented?
 
-* Pros
-    * Resource cleanup is sane. A File struct makes sense.
-* Cons
-    * Destructors have a hidden control path, and they definitely don't play
-      nice with exceptions or garbage collection. If neither of those become
-      language features, however, then destructors seem okay.
-    * How will they interact with our inheritance model?
+Some kind of resource-cleanup is necessary, but destructors can also have
+hidden side-effects, which shouldn't be allowed. Also, any destructor model
+must interact nicely with the library-based inheritance model.
+
+_ben: What if destructors are only allowed to manipulate class members and free
+memory?_
 
 ### Inline assembly.
 
