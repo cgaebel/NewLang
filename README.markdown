@@ -63,6 +63,11 @@ be incredibly unintuitive to C++-style programmers._
 
 ### Generics should be implemented only for classes.
 
+_ben: Function templates are almost never necessary. In fact, the only instance
+I can think of where they're useful is for functions for generic numeric
+operations, like averaging a vector of numbers (either floats or integers),
+where the code is the same for both._
+
 ### How should class generics be implemented?
 
 _ben: My current way would be:_
@@ -104,17 +109,21 @@ The third line is read "An integer, `j`, is the thing `p` points at."
 
 `infer` was the original idea, but that leads to confusing-looking code:
 
-`infer foo = 5`
+    infer foo = 5
 
 This seems to read "infer that foo is 5", which sounds like a replacement for
 `assert`, not type inferrence.
 
 `typeinfer` is too long to be used.
 
-_ben: `create` would be nice in the context above, since `create bar = 5` reads
-"create bar, which equals 5", clearly demonstrating that we're allocating a new
-variable, but not specifying the type. It seems out-of-place, though, because
-most variable declarations are `noun name`, not `verb name`._
+_ben: I'm thinking variable creation should be prefixed with +; that way,
+it's very easy to spot new variable allocations, and type can simply be omitted
+if necessary:
+
+    +int i = 5;
+    +string s = "hello world";
+    # Type name omitted (type inferred) but still clear that it's a declaration.
+    +b = 10;
 
 ### Operator overloading should be a language feature.
 
@@ -142,10 +151,8 @@ What about the following implementation?
     S uop(string op, const S* a);             // unary ops
     S bop(string op, const S* a, const S* b); // binary ops
 
-Fatal flaw: how do we handle `a += b`?
-
-_ben: += and similar operators can be inferred from + and = (and inlined), and
-then the optimizer can optimize the extraneous copying and whatnot._
+Composite operators like += can be inferred from their parts (+ and =); the
+optimizer can handle the extraneous copying and whatnot.
 
 ### Users should be allowed to create their own operators
 
@@ -171,6 +178,7 @@ This helps keep the code sane._
 
 _ben: Allow it, but with much greater restrictions than those of C++, like size
 conformity and only allowing casting from pointers TO integer types (not back)._
+
 _clark: I really like that rule._
 
 ### Destructors. They should exist. If you agree, in what form?
@@ -212,8 +220,8 @@ to write thread-safe APIs._
 * ptrdiff (signed, memsize)
 * bool (Only two valid assignments - true/false. No other assumptions about its
   representation are made.)
-* tinyfloat (equivalent to Cs `float`)
-* float (equivalent to Cs `double`)
+* tinyfloat (equivalent to C's `float`)
+* float (equivalent to C's `double`)
 
 ## Object Model
 
