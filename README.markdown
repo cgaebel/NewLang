@@ -181,6 +181,12 @@ conformity and only allowing casting from pointers TO integer types (not back)._
 
 _clark: I really like that rule._
 
+_ben: But what about casting between pointer types (e.g. `int*` to `byte*`)?
+It seems size-conformity should be held for pointer casts too (`int` is
+different in size from `byte`, thus illegal cast), and any pointer type should
+be castable to an `int`, including nested pointers (e.g. `char**` should be
+castable to an `int*`, since `char*` is castable to `int`)._
+
 ### Destructors. They should exist. If you agree, in what form?
 
 * Pros
