@@ -5,8 +5,7 @@
 * Indentation with spaces - not tabs.
 * Every member of the language spec has four parts:
     * Brief description
-    * Code sample (as short as possible, illustrating the feature in
-        isolation)
+    * Code sample (as short as possible, illustrating the feature in isolation)
     * Rationale
     * Limitations (optional)
 
@@ -45,6 +44,23 @@ to write any of these cleanly, the language is sorely lacking.
     * Less intuitive to C/C++-style programmers.
     * Less flexible.
 
+### Function header syntax should be more readable.
+
+Current: `int foo(int bar, int foobar)`
+
+Proposed: `foo(int bar, int foobar) = int:`
+
+This way, information is presented nicely from left-to-right, going from most
+general information, to most specific:
+
+ * It is a function named foo.
+ * It takes two parameters: `int bar` and `int foobar`.
+ * It returns an `int`, as shown by function definition on subsequent lines.
+
+_ben: It makes more sense linguistically, but the use of = unsettles me; I'd
+prefer something resembling the lunate epsilon. We could use {, but that would
+be incredibly unintuitive to C++-style programmers._
+
 ### Generics should be a language feature.
 
 * Pros
@@ -56,8 +72,6 @@ to write any of these cleanly, the language is sorely lacking.
 
 _ben: Perhaps they could be simplified greatly, only allowing for simple type
 generics, rather than the giant Turing-complete templates C++ has._
-
-### `void*` should be eliminated.
 
 ### Equality and assignment should be the same operator.
 
@@ -75,6 +89,25 @@ generics, rather than the giant Turing-complete templates C++ has._
 
 ### Backslash should be used as the pointer operator.
 
+`int i = 5;
+\int p = \i`
+
+### What keyword should replace `auto`?
+
+`infer` was the original idea, but that leads to confusing-looking code:
+
+`infer foo = 5`
+
+This seems to read "infer that foo is 5", which sounds like a replacement for
+`assert`, not type inferrence.
+
+`typeinfer` is too long to be used.
+
+_ben: `create` would be nice in the context above, since `create bar = 5` reads
+"create bar, which equals 5", clearly demonstrating that we're allocating a new
+variable, but not specifying the type. It seems out-of-place, though, because
+most variable declarations are `noun name`, not `verb name`._
+
 ### Operator overloading should be a language feature.
 
 * Pros
@@ -88,6 +121,7 @@ generics, rather than the giant Turing-complete templates C++ has._
 _ben: Overloaded operators should have a guarantee of purity - that if the same
 object is invoked with the same operator and the same parameter(s), then the
 result is guaranteed._
+
 _clark: What about if when an operator is overloaded, it MUST have the same
 mathematial properties as the thing it's emulating. Therefore, the (+) operator
 must be associative and commutative. This will ensure that only math-emulators
@@ -101,6 +135,21 @@ What about the following implementation?
     S bop(string op, const S* a, const S* b); // binary ops
 
 Fatal flaw: how do we handle `a += b`?
+
+_ben: += and similar operators can be inferred from + and = (and inlined), and
+then the optimizer can optimize the extraneous copying and whatnot._
+
+### Users should be allowed to create their own operators
+
+* Pros:
+    * Operations like dot-product and cross-product can have operators defined
+    for them, rather than using member functions.
+* Cons:
+    * Can lead to unreadable and unintuitive code.
+    * It's a lexical nightmare, depending on what restrictions we place on it.
+
+_ben: All operators should have a guarantee of purity, even user-created ones.
+This helps keep the code sane._
 
 ### Casting between arbitrary types should be allowed.
 
@@ -346,8 +395,6 @@ talk to C. Much of stdlib's string.h will have to be rewritten.
 
 Anonymous functions can be created with the function keyword.
 
-The "infer" keyword will replace "auto".
-
 All built-in types will have default initialization values; if default
 initialization is not wanted, there will be a keyword to prevent
 initialization.
@@ -355,10 +402,10 @@ initialization.
 Calling conventions will be undefined by default. This ensures the optimizer
 gets the best possible angle of attack on your code.
 
-There is a "pure" keyword. If a function is pure and unannotated, emit a
+There is a `pure` keyword. If a function is pure and unannotated, emit a
 diagnostic. If a function is annotated pure and is not, terminate compilation.
 
-"const" stays.
+`const` stays.
 
 Anonymous structs are a thing; members can be either named, or accessed with
 array operators (tuples). A syntax still needs to be decided upon. It should
