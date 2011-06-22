@@ -108,10 +108,17 @@ void pcopy(Array* a)
     if(a->dynamic_elems)
     {
         // BUG: No OOM checking.
-        Value* new_mem = malloc(a->dynamic_capacity * sizeof(Value));
-        memcpy(new_mem, a->dynamic_elems, a->dynamic_capacity * sizeof(Value));
+        size_t dynamic_bytes = a->dynamic_capacity * sizeof(Value);
+        Value* new_mem = malloc(dynamic_bytes);
+        memcpy(new_mem, a->dynamic_elems, dynamic_bytes);
         a->dynamic_elems = new_mem;
     }
+
+    // Recursively call pcopy on every element of the array.
+    for(size_t i = 0; i < a->static_length; ++i)
+        pcopy(&a->static_elems[i]);
+    for(size_t i = 0; i < a->dynamic_length; ++i)
+        pcopy(&a->dynamic_elems[i]);
 }
 
 // Note: the first two checks should be lifted into the parent function by the
