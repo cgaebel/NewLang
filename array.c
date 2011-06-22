@@ -8,8 +8,7 @@
 //
 // Arrays consist of two parts: the static half, and the dynamic half. The
 // static half is constructed at initialization directly on the stack and has
-// a fixed size throughout the array's lifetime. Note that the static_capacity
-// may be zero if the initial size is unknown at initialization. The static
+// a fixed size throughout the array's lifetime. Note that the static_capacity // may be zero if the initial size is unknown at initialization. The static
 // half is analogous to a C99 array.
 //
 // The dynamic half is constructed as the array grows. If more elements are in
@@ -29,6 +28,10 @@
 //     stack, and the rest lie in contiguous memory.
 #include <stddef.h>
 #include <stdbool.h>
+
+// The minimum size of the dynamic half after the initial allocation.
+// This should always be a power of two for performance reasons.
+#define DYNAMIC_SIZE_MIN    16
 
 struct Array
 {
@@ -55,24 +58,24 @@ size_t length(Array* a)
     return a->static_length + a->dynamic_length;
 }
 
-void reserve(Array* a, size_t cap)
+void reserve(Array* a, size_t capacity)
 {
-    if(length(a) >= cap)
+    if(capacity <= length(a))
         return;
 
-    if(cap <= a->static_capacity)
+    if(capacity <= a->static_capacity)
         return;
 
-    resize_dynamic(a, cap - static_capacity);
+    resize_dynamic(a, capacity - a->static_capacity);
 }
 
 // `a' MUST be allocated in the parent function with the following stub:
 //
-//    #define len(requested_size) (5*sizeof(size_t) + requested_size*sizeof(Value))
-//      sub rsp, len
-//      mov [rsp+(4*sizeof(size_t))], len // set up static_capacity
-//      mov rdi, rsp // pass the newly allocated struct to Array.init
-//      call Array.init
+//   #define len(requested_size) (5*sizeof(size_t) + requested_size*sizeof(Value))
+//     sub rsp, len
+//     mov [rsp+(4*sizeof(size_t))], len // set up static_capacity
+//     mov rdi, rsp // pass the newly allocated struct to Array.init
+//     call Array.init
 //
 // And when the function's scope is exited, `a' must be deallocated with:
 //
@@ -105,8 +108,17 @@ void pcopy(Array* a)
     if(a->dynamic_elems)
     {
         // BUG: No OOM checking.
-        a->dynamic_elems = realloc(a->dynamic_elems, a->dynamic_capacity);
+        size_t dynamic_bytes = a->dynamic_capacity * sizeof(Value);
+        Value* new_mem = malloc(dynamic_bytes);
+        memcpy(new_mem, a->dynamic_elems, dynamic_bytes);
+        a->dynamic_elems = new_mem;
     }
+
+    // Recursively call pcopy on every element of the array.
+    for(size_t i = 0; i < a->static_length; ++i)
+        pcopy(&a->static_elems[i]);
+    for(size_t i = 0; i < a->dynamic_length; ++i)
+        pcopy(&a->dynamic_elems[i]);
 }
 
 // Note: the first two checks should be lifted into the parent function by the
@@ -127,7 +139,7 @@ void append(Array* a, const Value* v)
     {
         // if the dynamic buffer is empty, create a small initial reservation.
         // otherwise, double the size.
-        if(a->dynamic_capacity == 0)  reserve_dynamic(a, 16);
+        if(a->dynamic_capacity == 0)  reserve_dynamic(a, DYNAMIC_SIZE_MIN);
         else                          reserve_dynamic(a, a->dynamic_capacity * 2);
 
         a->dynamic_elems[a->dynamic_length++] = *v;
@@ -147,10 +159,46 @@ void foreach(Array* a, void (*iter)(Value*, void*), void* aux)
 // This entire function should be inlined by the compiler.
 Value* index(Array* a, size_t i)
 {
-    assert(i <= length(a));
+    assert(i < length(a));
 
     if(i < a->static_length)
         return &a->static_elems[i];
     else
         return &a->dynamic_elems[i - a->static_length];
+}
+
+// Note: None of the removal functions call pcopy or any destructors.
+// There is no need, since the elements are being returned. If necessary, these
+// functions will be called in the parent scope.
+
+Value remove_last(Array* a)
+{
+    // FASTPATH
+    if(a->dynamic_length == 0)
+        return a->static_elems[--a->static_length];
+
+    Value ret = a->dynamic_elems[--a->dynamic_length];
+
+    if(a->dynamic_length == 0)
+    {
+        resize_dynamic(a, 0);
+    }
+    else if(a->dynamic_length <= a->dynamic_capacity >> 2
+         && a->dynamic_length >= DYNAMIC_SIZE_MIN)
+    {
+        resize_dynamic(a, a->dynamic_capacity >> 1);
+    }
+
+    return ret;
+}
+
+// Removes an element from the array without preserving the order of the
+// elements.
+Value unordered_remove(Array* a, size_t index)
+{
+    // assumes swap(Value*, Value*) has been defined. Hopefully, swapping will
+    // be a compiler builtin.
+ 
+    swap(index(a, i), index(a, length(a) - 1));
+    return remove_last(a);
 }
