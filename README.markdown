@@ -59,6 +59,22 @@ generics, rather than the giant Turing-complete templates C++ has._
 
 ### `void*` should be eliminated.
 
+### Equality and assignment should be the same operator.
+
+* Pros
+    * More intuitive.
+* Cons
+    * Makes return values of operators context-sensitive.
+
+### Return values should be part of a function header.
+
+* Pros
+    * Allows overloading by only return type.
+* Cons
+    * Forces the compiler to have good type inferrence.
+
+### Backslash should be used as the pointer operator.
+
 ### Operator overloading should be a language feature.
 
 * Pros
@@ -278,7 +294,8 @@ construction.
 
 ## Functions
 
-*TODO*
+Variadic functions will take a tuple of all the variadic arguments as a
+parameter, which can then be iterated over, used with RTTI, etc.
 
 ## Pointers
 
@@ -307,6 +324,9 @@ All tests are attempted. If a test fails, it is marked and testing of the rest
 continues.
 
 ## To Be Organized
+
+Generics and RTTI may be either runtime or compile-time determined; the
+optimizer may choose which is preferable.
 
 Only single-line comments are allowed, with \#.
 
