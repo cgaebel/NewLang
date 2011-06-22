@@ -61,17 +61,19 @@ _ben: It makes more sense linguistically, but the use of = unsettles me; I'd
 prefer something resembling the lunate epsilon. We could use {, but that would
 be incredibly unintuitive to C++-style programmers._
 
-### Generics should be a language feature.
+### Generics should be implemented only for classes.
 
-* Pros
-    * How do we implement vectors without? It really should be a library
-      feature until optimization concerns come into play.
-* Cons
-    * Simplicity. Both in reading code and in compiler implementation.
-    * Have you _seen_ C++?
+### How should class generics be implemented?
 
-_ben: Perhaps they could be simplified greatly, only allowing for simple type
-generics, rather than the giant Turing-complete templates C++ has._
+_ben: My current way would be:
+
+    Type vector(typename)
+    {
+        typename[] data;
+        uint length;
+    }
+
+Essentially function-definition syntax, but with `Type` as the return type._
 
 ### Equality and assignment should be the same operator.
 
@@ -80,7 +82,7 @@ generics, rather than the giant Turing-complete templates C++ has._
 * Cons
     * Makes return values of operators context-sensitive.
 
-### Return values should be part of a function header.
+### Return values should be part of a function's signature.
 
 * Pros
     * Allows overloading by only return type.
@@ -90,7 +92,13 @@ generics, rather than the giant Turing-complete templates C++ has._
 ### Backslash should be used as the pointer operator.
 
 `int i = 5;
-\int p = \i`
+\int p = \i
+int j = p\`
+
+The second line is read intuitively as "A pointer to an integer, `p`, is a
+pointer to `i`"
+
+The third line is read "An integer, `j`, is the thing `p` points at."
 
 ### What keyword should replace `auto`?
 
