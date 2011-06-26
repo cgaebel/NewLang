@@ -104,6 +104,11 @@ pointer to `i`"
 
 The third line is read "An integer, `j`, is the thing `p` points at."
 
+### `void` should be narrowed-down and renamed.
+
+_ben: I propose allowing `void` only for function return types, and calling
+it `noret` (i.e. "no return")._
+
 ### What keyword should replace `auto`?
 
 `infer` was the original idea, but that leads to confusing-looking code:
