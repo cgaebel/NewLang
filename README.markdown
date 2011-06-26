@@ -63,7 +63,7 @@ be incredibly unintuitive to C++-style programmers._
 
 ### How should class generics be implemented?
 
-_ben: My current way would be:_
+_ben: My proposed way would be:_
 
     Type vector(typename)
     {
@@ -73,9 +73,11 @@ _ben: My current way would be:_
 
 _Essentially function-definition syntax, but with `Type` as the return type._
 
-### How sohuld function generics be implemented?
+### How should function generics be implemented?
 
+_ben: I would propose allowing them only as functions of class generics, like:_
 
+    void genericFunc(myClass(T1, T2) myObj)
 
 ### Equality and assignment should be the same operator.
 
