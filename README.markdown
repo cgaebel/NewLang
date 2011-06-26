@@ -86,6 +86,11 @@ _ben: I would propose allowing them only as functions of class generics, like:_
 * Cons
     * Makes return values of operators context-sensitive.
 
+### Only one of each increment/decrement operator, and no return value.
+
+Code is simply confusing to read when return values of increment/decrement
+operators are used; they should be eliminated.
+
 ### Return values should be part of a function's signature.
 
 * Pros
