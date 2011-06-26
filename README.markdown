@@ -205,6 +205,11 @@ must interact nicely with the library-based inheritance model.
 _ben: What if destructors are only allowed to manipulate class members and free
 memory?_
 
+### `static` should be replaced with `noscope`
+
+`static` should only be applicable inside classes and functions, and be called
+`noscope`.
+
 ### Inline assembly.
 
 * Pros
