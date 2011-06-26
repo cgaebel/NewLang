@@ -37,27 +37,33 @@ to write any of these cleanly, the language is sorely lacking.
 
 ### "Run once" and "Run subsequent" code blocks.
 
+_ben:
 Much like static constructors in D, there should be support for functions,
 modules, and classes to have "run once" code blocks, which will be run either
-on first call or program initialization.
+on first call or program initialization._
 
-Additionally, there should be "run subsequent" blocks, which are run every time
-_except_ the first time, functionality which comes in handy with loops (and,
+_Additionally, there should be "run subsequent" blocks, which are run every time
+**except** the first time, functionality which comes in handy with loops (and,
 with loops, translates nicely to assembly, where arbitrary entry points on
-loops are supported).
+loops are supported)._
 
 ### Control-flow breaking keywords should be eliminated.
 
+_ben:
 Elimination of `goto`, as well as the "return-immediately" functionality of
 `return`. Because of the heavy amount of if-else switching this will create,
 it will also promote factoring out of code into other functions (or excessive
-amounts of indenting).
+amounts of indenting)._
+
+_However, these keywords (especially early returns) are useful for base cases,
+so there should be some form of support for base-case processing._
 
 ### No built-in error handling.
 
+_ben:
 Error-handling is something that's very difficult to get right, and often
 dependent on the project - the user can create their own error-handling
-mechanisms.
+mechanisms._
 
 ### Indentation should be used instead of braces for indicating scope.
 
