@@ -35,6 +35,30 @@ to write any of these cleanly, the language is sorely lacking.
 
 ## Points of Contention
 
+### "Run once" and "Run subsequent" code blocks.
+
+Much like static constructors in D, there should be support for functions,
+modules, and classes to have "run once" code blocks, which will be run either
+on first call or program initialization.
+
+Additionally, there should be "run subsequent" blocks, which are run every time
+_except_ the first time, functionality which comes in handy with loops (and,
+with loops, translates nicely to assembly, where arbitrary entry points on
+loops are supported).
+
+### Control-flow breaking keywords should be eliminated.
+
+Elimination of `goto`, as well as the "return-immediately" functionality of
+`return`. Because of the heavy amount of if-else switching this will create,
+it will also promote factoring out of code into other functions (or excessive
+amounts of indenting).
+
+### No built-in error handling.
+
+Error-handling is something that's very difficult to get right, and often
+dependent on the project - the user can create their own error-handling
+mechanisms.
+
 ### Indentation should be used instead of braces for indicating scope.
 
 * Pros
@@ -426,9 +450,6 @@ coding.
 
 No header files, only modules. We can probably rip off D's module system in its
 entirety.
-
-Static constructors from D still exist (likely renamed to init(), or
-something similar).
 
 Strings are vectors of chars. Conversion to C-strings will be necessary to
 talk to C. Much of stdlib's string.h will have to be rewritten.
