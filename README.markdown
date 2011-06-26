@@ -61,13 +61,6 @@ _ben: It makes more sense linguistically, but the use of = unsettles me; I'd
 prefer something resembling the lunate epsilon. We could use {, but that would
 be incredibly unintuitive to C++-style programmers._
 
-### Generics should be implemented only for classes.
-
-_ben: Function templates are almost never necessary. In fact, the only instance
-I can think of where they're useful is for functions for generic numeric
-operations, like averaging a vector of numbers (either floats or integers),
-where the code is the same for both._
-
 ### How should class generics be implemented?
 
 _ben: My current way would be:_
@@ -79,6 +72,10 @@ _ben: My current way would be:_
     }
 
 _Essentially function-definition syntax, but with `Type` as the return type._
+
+### How sohuld function generics be implemented?
+
+
 
 ### Equality and assignment should be the same operator.
 
