@@ -8,6 +8,8 @@
     * Code sample (as short as possible, illustrating the feature in isolation)
     * Rationale
     * Limitations (optional)
+ * No point of contention can become part of the language unless both parties
+ have commented on it.
 
 # Viability
 
