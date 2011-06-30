@@ -93,17 +93,19 @@ _ben: It makes more sense linguistically, but the use of = unsettles me; I'd
 prefer something resembling the lunate epsilon. We could use {, but that would
 be incredibly unintuitive to C++-style programmers._
 
+### `class` should be replaced with `Type`.
+
+_ben: It just makes more sense to me._
+
 ### How should class generics be implemented?
 
 _ben: My proposed way would be:_
 
-    Type vector(typename)
+    class vector(typename)
     {
         typename[] data;
         uint length;
     }
-
-_Essentially function-definition syntax, but with `Type` as the return type._
 
 ### How should function generics be implemented?
 
@@ -132,12 +134,18 @@ operators are used; they should be eliminated.
 
 ### Backslash should be used as the pointer operator.
 
+This eliminates the context-dependence of the `*` character.
+
+### Pointer syntax should be changed.
+
+_ben: Proposed:_
+
     int i = 5;
     \int p = \i
     int j = p\
 
-The second line is read intuitively as "A pointer to an integer, `p`, is a
-pointer to `i`"
+_The second line is read intuitively as "A pointer to an integer, `p`, is a
+pointer to `i`"_
 
 The third line is read "An integer, `j`, is the thing `p` points at."
 
@@ -148,16 +156,14 @@ it `noret` (i.e. "no return")._
 
 ### What keyword should replace `auto`?
 
-`infer` was the original idea, but that leads to confusing-looking code:
+_ben: `infer` was the original idea, but that leads to confusing-looking code:_
 
     infer foo = 5
 
-This seems to read "infer that foo is 5", which sounds like a replacement for
-`assert`, not type inferrence.
+_This seems to read "infer that foo is 5", which sounds like a replacement for
+`assert`, not type inferrence._
 
-`typeinfer` is too long to be used.
-
-_ben: I'm thinking variable creation should be prefixed with +; that way,
+_I'm thinking variable creation should be prefixed with +; that way,
 it's very easy to spot new variable allocations, and type can simply be omitted
 if necessary:
 
