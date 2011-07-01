@@ -76,6 +76,8 @@ mechanisms._
     * Less intuitive to C/C++-style programmers.
     * Less flexible.
 
+_ben: I am in favor!_
+
 ### Function header syntax should be more readable.
 
 Current: `int foo(int bar, int foobar)`
@@ -120,10 +122,14 @@ _ben: I would propose allowing them only as functions of class generics, like:_
 * Cons
     * Makes return values of operators context-sensitive.
 
+_ben: I am in favor._
+
 ### Only one of each increment/decrement operator, and no return value.
 
 Code is simply confusing to read when return values of increment/decrement
 operators are used; they should be eliminated.
+
+_ben: I proposed this._
 
 ### Return values should be part of a function's signature.
 
@@ -132,9 +138,13 @@ operators are used; they should be eliminated.
 * Cons
     * Forces the compiler to have good type inferrence.
 
+_ben: Makes sense, especially if we tone down function generics._
+
 ### Backslash should be used as the pointer operator.
 
 This eliminates the context-dependence of the `*` character.
+
+_ben: I proposed this._
 
 ### Pointer syntax should be changed.
 
@@ -147,7 +157,7 @@ _ben: Proposed:_
 _The second line is read intuitively as "A pointer to an integer, `p`, is a
 pointer to `i`"_
 
-The third line is read "An integer, `j`, is the thing `p` points at."
+_The third line is read "An integer, `j`, is the thing `p` points at."_
 
 ### `void` should be narrowed-down and renamed.
 
@@ -161,16 +171,8 @@ _ben: `infer` was the original idea, but that leads to confusing-looking code:_
     infer foo = 5
 
 _This seems to read "infer that foo is 5", which sounds like a replacement for
-`assert`, not type inferrence._
-
-_I'm thinking variable creation should be prefixed with +; that way,
-it's very easy to spot new variable allocations, and type can simply be omitted
-if necessary:
-
-    +int i = 5;
-    +string s = "hello world";
-    # Type name omitted (type inferred) but still clear that it's a declaration.
-    +b = 10;
+`assert`, not type inferrence. We could use the Type keyword, but this is
+already proposed for class definitions, and would then be context-dependent._
 
 ### Operator overloading should be a language feature.
 
@@ -193,13 +195,18 @@ overload these operators. We still need to think of a syntax though. And don't
 forget that there are unary AND binary operators, as well as the possibilty
 (or lack) of user-defined operators._
 
-What about the following implementation?
+_What about the following implementation?_
 
     S uop(string op, const S* a);             // unary ops
     S bop(string op, const S* a, const S* b); // binary ops
 
-Composite operators like += can be inferred from their parts (+ and =); the
-optimizer can handle the extraneous copying and whatnot.
+_ben: Operators like +=, -=, *=, /=, are only annoying when their return values
+are used, so they could be eliminated in favor of their corresponding "normal"
+operators (+, -, *, /). It can be structured as follows:_
+
+ * When the return value of a binary operator (+, -, *, /, etc.) is used, it's
+ simply that binary operator.
+ * When the return value is not used, it acts as assignment.
 
 ### Users should be allowed to create their own operators
 
@@ -223,19 +230,16 @@ This helps keep the code sane._
     * Makes the compiler's job harder. Less assumptions can be made.
     * It's evil. Almost everywhere. Is there anywhere it's necessary?
 
-_ben: Allow it, but with much greater restrictions than those of C++, like size
-conformity and only allowing casting from pointers TO integer types (not back)._
-
-_clark: I really like that rule._
-
-_ben: But what about casting between pointer types (e.g. `int*` to `byte*`)?
-It seems size-conformity should be held for pointer casts too (`int` is
-different in size from `byte`, thus illegal cast), and any pointer type should
-be castable to an `int`, including nested pointers (e.g. `char**` should be
-castable to an `int*`, since `char*` is castable to `int`)._
+_ben: Proposed:_
+ * All pointer types can be cast to `native` (including casts like `char**`
+    to `native*`).
+ * You can only cast to an object of smaller or equal size (e.g. `uint32` to
+    `uint8`).
+ * Size enforcing is done through pointers as well (illegal: `uint8` to
+    `uint32`)
 
 _ben: However, pointer-casting is only necessary in low-level applications,
-like your byte-order example above. For such a low-level niche, perhaps C
+like your byte-swapping example above. For such a low-level niche, perhaps C
 should just be used. Forcing people to use C in such cases means we get to
 make the language much safer by disallowing pointer-casting altogether._
 
@@ -246,12 +250,17 @@ hidden side-effects, which shouldn't be allowed. Also, any destructor model
 must interact nicely with the library-based inheritance model.
 
 _ben: What if destructors are only allowed to manipulate class members and free
-memory?_
+memory? That way, to have destructors which affect global data, you essentially
+have to give that class a member which is a pointer to that global data, making
+your code ugly. So evil destructors will be ugly and cumbersome, which is
+perfect._
 
 ### `static` should be replaced with `noscope`
 
 `static` should only be applicable inside classes and functions, and be called
 `noscope`.
+
+_ben: Proposed by me._
 
 ### Inline assembly.
 
@@ -263,21 +272,12 @@ memory?_
     * Complicates things. What could have once been undefined behavior now
       needs precise, well-documented semantics.
 
-### Unit tests for separate modules should be run in parallel.
-
-* Pros
-    * Testing becomes significantly faster.
-    * Thread-unsafe code will break.
-* Cons
-    * Every module's public API will need to be reentrant.
-
-_clark: This MAY be a good thing, since there's no legacy code that needs
-porting. And since it's baked into the language, it essentially REQUIRES people
-to write thread-safe APIs._
+_ben: Is assembly really necessary? I feel like if we have C, it should be
+fine._
 
 ## Built-in types
 
-* int\[8, 16, 32, 64, inf\] (unsigned types begin with `u`)
+* \(u\)int\[8, 16, 32, 64, inf\]
 * native (unsigned. memsize)
 * ptrdiff (signed, memsize)
 * bool (Only two valid assignments - true/false. No other assumptions about its
@@ -487,6 +487,8 @@ array operators (tuples). A syntax still needs to be decided upon. It should
 probably resemble lambdas.
 
 n-conditionals are allowed (e.g. x < y < z = 0).
+
+Unit tests for separate modules are run in parallel.
 
 Nice interfacing with C.
 
