@@ -67,47 +67,13 @@ Error-handling is something that's very difficult to get right, and often
 dependent on the project - the user can create their own error-handling
 mechanisms._
 
-### Indentation should be used instead of braces for indicating scope.
-
-* Pros
-    * Enforces nice readability.
-    * More intuitive.
-* Cons
-    * Less intuitive to C/C++-style programmers.
-    * Less flexible.
-
-_ben: I am in favor!_
-
-### Function header syntax should be more readable.
-
-Current: `int foo(int bar, int foobar)`
-
-Proposed: `foo(int bar, int foobar) = int:`
-
-This way, information is presented nicely from left-to-right, going from most
-general information, to most specific:
-
- * It is a function named foo.
- * It takes two parameters: `int bar` and `int foobar`.
- * It returns an `int`, as shown by function definition on subsequent lines.
-
-_ben: It makes more sense linguistically, but the use of = unsettles me; I'd
-prefer something resembling the lunate epsilon. We could use {, but that would
-be incredibly unintuitive to C++-style programmers._
-
-### `class` should be replaced with `Type`.
-
-_ben: It just makes more sense to me._
-
 ### How should class generics be implemented?
 
 _ben: My proposed way would be:_
 
     class vector(typename)
-    {
         typename[] data;
         uint length;
-    }
 
 ### How should function generics be implemented?
 
@@ -115,7 +81,10 @@ _ben: I would propose allowing them only as functions of class generics, like:_
 
     void genericFunc(myClass(T1, T2) myObj)
 
-### Equality and assignment should be the same operator.
+### Double operators should be eliminated.
+
+_ben: `==`, `&&`, `||`, et al. should be eliminated in favor of
+context-sensitive `=`, `&`, and `|`.
 
 * Pros
     * More intuitive.
@@ -123,56 +92,6 @@ _ben: I would propose allowing them only as functions of class generics, like:_
     * Makes return values of operators context-sensitive.
 
 _ben: I am in favor._
-
-### Only one of each increment/decrement operator, and no return value.
-
-Code is simply confusing to read when return values of increment/decrement
-operators are used; they should be eliminated.
-
-_ben: I proposed this._
-
-### Return values should be part of a function's signature.
-
-* Pros
-    * Allows overloading by only return type.
-* Cons
-    * Forces the compiler to have good type inferrence.
-
-_ben: Makes sense, especially if we tone down function generics._
-
-### Backslash should be used as the pointer operator.
-
-This eliminates the context-dependence of the `*` character.
-
-_ben: I proposed this._
-
-### Pointer syntax should be changed.
-
-_ben: Proposed:_
-
-    int i = 5;
-    \int p = \i
-    int j = p\
-
-_The second line is read intuitively as "A pointer to an integer, `p`, is a
-pointer to `i`"_
-
-_The third line is read "An integer, `j`, is the thing `p` points at."_
-
-### `void` should be narrowed-down and renamed.
-
-_ben: I propose allowing `void` only for function return types, and calling
-it `noret` (i.e. "no return")._
-
-### What keyword should replace `auto`?
-
-_ben: `infer` was the original idea, but that leads to confusing-looking code:_
-
-    infer foo = 5
-
-_This seems to read "infer that foo is 5", which sounds like a replacement for
-`assert`, not type inferrence. We could use the Type keyword, but this is
-already proposed for class definitions, and would then be context-dependent._
 
 ### Operator overloading should be a language feature.
 
@@ -243,25 +162,6 @@ like your byte-swapping example above. For such a low-level niche, perhaps C
 should just be used. Forcing people to use C in such cases means we get to
 make the language much safer by disallowing pointer-casting altogether._
 
-### How should destructors be implemented?
-
-Some kind of resource-cleanup is necessary, but destructors can also have
-hidden side-effects, which shouldn't be allowed. Also, any destructor model
-must interact nicely with the library-based inheritance model.
-
-_ben: What if destructors are only allowed to manipulate class members and free
-memory? That way, to have destructors which affect global data, you essentially
-have to give that class a member which is a pointer to that global data, making
-your code ugly. So evil destructors will be ugly and cumbersome, which is
-perfect._
-
-### `static` should be replaced with `noscope`
-
-`static` should only be applicable inside classes and functions, and be called
-`noscope`.
-
-_ben: Proposed by me._
-
 ### Inline assembly.
 
 * Pros
@@ -287,14 +187,13 @@ fine._
 
 ## Object Model
 
-Objects are POD (plain old data).
+Objects are POD (plain old data), and the `struct` keywrd is replaced with
+`type`.
 
-    struct SomeObject
-    {
+    type SomeObject
         int a;
         SomeOtherObject b;
         int c;
-    }
 
 Any function taking an `Object*` as its first parameter can be syntactically
 used as a member function of that type. This can be extended to accomodate
@@ -302,16 +201,14 @@ a multiple-dispatch syntax.
 
 Therefore,
 
-    int foo(SomeObject* this, int x, int y)
-    {
+    foo(SomeObject$ this, int x, int y) -> int
         ++this.c;
         return x + y + this.a;
-    }
 
     SomeObject bar;
     int z = bar.foo(2, 3);
 
-    SomeObject* pbar = &bar;
+    SomeObject$ pbar = $bar;
     z = pbar.foo(2, 3);
 
 is entirely valid syntax.
@@ -325,20 +222,17 @@ nothing.
 Before an object's default constructor is called, the default constructor for
 all its elements will be called.
 
-    struct S
-    {
+    type S
         int a;
         int b;
         int c;
-    }
 
     S s; // all elements are set to zero since the default constructor
          // generated by the compiler sets all ints to zero.
 
     ///////////////////////////////////////////////////////////////////////////
 
-    S S()
-    {
+    S() -> S
         S ret; // TODO: This is recursive. Fix. Do we need a different syntax?
                //       What if we had an implicit `this` parameter, which is
                //       a pointer to the object to be constructed (after its
@@ -349,15 +243,13 @@ all its elements will be called.
         ret.c = 3;
 
         return ret;
-    }
 
     S s; // in this case, we have a default constructor. s will be { 1, 2, 3 }.
 
 To define a constructor which takes arguments, you can just use an ordinary
 function!
 
-    S S(int x, int y)
-
+    S(int x, int y) -> S
         S ret; // calls the default constructor first...
 
         ret.a = x;
@@ -366,7 +258,6 @@ function!
         assert(ret.c == 3); // From the default constructor.
 
         return ret;
-    }
 
     S s = S(9, 10);
     assert(s == { 9, 10, 3 });
@@ -380,17 +271,16 @@ from an lvalue, or passing-by-value. It is done in two steps:
 2. `pcopy()` is run on the new structure.
 
 `pcopy()` is a user-defined function defined as `void pcopy(S*)` where S is the
-type of the struct you want `pcopy` to be defined for. It stands for *p*ost
+type of the type you want `pcopy` to be defined for. It stands for *p*ost
 *copy* since the function is run after the structure's elements have been
 copied. If `pcopy()` is not defined for a structure, a blank one is generated
 by the compiler.
 
-    struct S { int a; }
+    type S
+        int a;
 
-    void pcopy(S* s)
-    {
+    pcopy(S* s) -> void
         s.a += 1; // increments s.a every time a copy is made.
-    }
 
     S s;
     assert(s.a == 0); // thanks to int's default constructor
@@ -400,18 +290,22 @@ by the compiler.
 
     // Even though S is returned, pcopy isn't run. This is because it is
     // entirely transparent, and would just be wasted cycles.
-    S returns1()
-    {
+    returns1() -> S
         S ret;
         ret.a = 1;
         return ret;
-    }
 
     S y = returns1();
     assert(y.a == 1);
 
 Move constructors are not necessary, since it can be emulated by the compiler
 refusing to call `pcopy()`.
+
+A destructor for type `T` is defined as such:
+
+    destroy(T$ obj) -> void
+
+If a destructor is not user-supplied, a default (empty) one is provided.
 
 ### Inheritance/Polymorphism
 
@@ -424,6 +318,13 @@ construction.
 Variadic functions will take a tuple of all the variadic arguments as a
 parameter, which can then be iterated over, used with RTTI, etc.
 
+Function header syntax is being changed to be more readable:
+
+    foo(int bar) -> int
+
+For functions which do not return a value, `null` should be used as the return
+type.
+
 ## Pointers
 
 In NewLang, the . operator will work for both objects and object pointers.
@@ -435,6 +336,12 @@ C++'s references (as a replacement for pointers) do not exist.
 `restrict` pointers are allowed, with some heavy static checking to ensure
 coder sanity.
 
+`*` is replaced by `$` as the pointer operator:
+
+    int i = 5
+    int$ p = $i
+    int j = i$
+
 ## Testing
 
 Tests are run as the final step in compilation. A failed test is equal to a
@@ -443,14 +350,23 @@ may be disabled with an attribute on the unittest block. Possibly something
 like:
 
     unittest(disable)
-    {
         assert(2 + 2 == 5); // WHY DOESN'T THIS WORK!?!
-    }
 
 All tests are attempted. If a test fails, it is marked and testing of the rest
 continues.
 
 ## To Be Organized
+
+`auto` still exists, but only applies to variable declarations.
+
+`static` is eliminated, except for the case where it means "local to this
+module", where it is renamed to `local`.
+
+Indentation replaces braces, similar to Python.
+
+Postfix increment/decrement operators are eliminated.
+
+Prefix increment/decrement operators have no return value.
 
 Generics and RTTI may be either runtime or compile-time determined; the
 optimizer may choose which is preferable.
@@ -482,7 +398,7 @@ diagnostic. If a function is annotated pure and is not, terminate compilation.
 
 `const` stays.
 
-Anonymous structs are a thing; members can be either named, or accessed with
+Anonymous types are a thing; members can be either named, or accessed with
 array operators (tuples). A syntax still needs to be decided upon. It should
 probably resemble lambdas.
 
