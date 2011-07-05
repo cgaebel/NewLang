@@ -37,43 +37,7 @@ to write any of these cleanly, the language is sorely lacking.
 
 ## Points of Contention
 
-### "Run once" and "Run subsequent" code blocks.
-
-_ben:
-Much like static constructors in D, there should be support for functions,
-modules, and classes to have "run once" code blocks, which will be run either
-on first call or program initialization._
-
-_Additionally, there should be "run subsequent" blocks, which are run every time
-**except** the first time, functionality which comes in handy with loops (and,
-with loops, translates nicely to assembly, where arbitrary entry points on
-loops are supported)._
-
-### Control-flow breaking keywords should be eliminated.
-
-_ben:
-Elimination of `goto`, as well as the "return-immediately" functionality of
-`return`. Because of the heavy amount of if-else switching this will create,
-it will also promote factoring out of code into other functions (or excessive
-amounts of indenting)._
-
-_However, these keywords (especially early returns) are useful for base cases,
-so there should be some form of support for base-case processing._
-
-### No built-in error handling.
-
-_ben:
-Error-handling is something that's very difficult to get right, and often
-dependent on the project - the user can create their own error-handling
-mechanisms._
-
-### How should class generics be implemented?
-
-_ben: My proposed way would be:_
-
-    class vector(typename)
-        typename[] data;
-        uint length;
+### Anonymous function syntax.
 
 ### How should function generics be implemented?
 
@@ -81,10 +45,7 @@ _ben: I would propose allowing them only as functions of class generics, like:_
 
     void genericFunc(myClass(T1, T2) myObj)
 
-### Double operators should be eliminated.
-
-_ben: `==`, `&&`, `||`, et al. should be eliminated in favor of
-context-sensitive `=`, `&`, and `|`.
+### == should be eliminated in favor of =.
 
 * Pros
     * More intuitive.
@@ -127,6 +88,9 @@ operators (+, -, *, /). It can be structured as follows:_
  simply that binary operator.
  * When the return value is not used, it acts as assignment.
 
+_ben: I'd prefer having only the guarantee of purity, but functions can be
+annotated for associativity, commutativity, and other properties._
+
 ### Users should be allowed to create their own operators
 
 * Pros:
@@ -161,19 +125,6 @@ _ben: However, pointer-casting is only necessary in low-level applications,
 like your byte-swapping example above. For such a low-level niche, perhaps C
 should just be used. Forcing people to use C in such cases means we get to
 make the language much safer by disallowing pointer-casting altogether._
-
-### Inline assembly.
-
-* Pros
-    * Makes the language a true systems programming language.
-    * Performance concerns can be alleviated with "just write it in assembly if
-      you care!"
-* Cons
-    * Complicates things. What could have once been undefined behavior now
-      needs precise, well-documented semantics.
-
-_ben: Is assembly really necessary? I feel like if we have C, it should be
-fine._
 
 ## Built-in types
 
@@ -313,6 +264,24 @@ Inheritance (and, by extension, polymorphism) is not a language built-in. A
 vtable library will be provided by the standard library to assist in explicit
 construction.
 
+### Generic Objects
+
+See `Generics` section.
+
+## Generics
+
+### Object Generics
+
+Generic objects can be paramaterized with a type *only*, as such:
+
+    type List(T)
+        # This is the same `T`!
+        type Node(T)
+            T val
+            Node(T)$ next
+
+        Node(T)$ head
+
 ## Functions
 
 Variadic functions will take a tuple of all the variadic arguments as a
@@ -359,10 +328,24 @@ continues.
 
 `auto` still exists, but only applies to variable declarations.
 
+Semicolons for the purpose of ending expressions is no longer a thing.
+
 `static` is eliminated, except for the case where it means "local to this
 module", where it is renamed to `local`.
 
+Exceptions from D are implemented, but the number of built-in exceptions will
+be largely reduced.
+
+Boolean and bitwise operators are one and the same; operation will be
+determined by parameter type.
+
 Indentation replaces braces, similar to Python.
+
+Built-in high-resolution timer.
+
+Inline assembly.
+
+Built-in CPUID.
 
 Postfix increment/decrement operators are eliminated.
 
