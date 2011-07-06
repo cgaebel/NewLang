@@ -74,7 +74,7 @@ _What about the following implementation?_
 _ben: I'd prefer having only the guarantee of purity, but functions can be
 annotated for associativity, commutativity, and other properties._
 
-### Users should be allowed to create their own operators
+### Users should be allowed to create their own operators.
 
 * Pros:
     * Operations like dot-product and cross-product can have operators defined
