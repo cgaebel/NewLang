@@ -8,7 +8,8 @@
 //
 // Arrays consist of two parts: the static half, and the dynamic half. The
 // static half is constructed at initialization directly on the stack and has
-// a fixed size throughout the array's lifetime. Note that the static_capacity // may be zero if the initial size is unknown at initialization. The static
+// a fixed size throughout the array's lifetime. Note that the static_capacity
+// may be zero if the initial size is unknown at initialization. The static
 // half is analogous to a C99 array.
 //
 // The dynamic half is constructed as the array grows. If more elements are in
